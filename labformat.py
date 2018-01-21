@@ -1,6 +1,6 @@
 # -- encoding: utf-8 --
 from labstructure import LabStructure
-import re
+import re,copy
 from sys import exit
 from txt2pinyin import txt2pinyin
 
@@ -74,9 +74,12 @@ def show(tree_list,shift=0):
 def tree(words,rhythms,syllables):
 	assert len(words)==len(rhythms)
 	assert len(''.join(words))/3==len(syllables)
-	tree_init={'phone':[],'rhythm0':[],'rhythm1_2':[],'rhythm3':[],'rhythm4':[],'assist':{}}
-	tree_init['assist']={'phone':None,'rhythm0':None,'rhythm1_2':None,'rhythm3':None,'rhythm4':None}
-	syllable_copy=syllables
+	tree_init={'assist':{}}
+	for key,value in rhythm_map.items():
+		tree_init[value]=[]
+		tree_init['assist'][value]=None
+	# print tree_init
+	syllable_copy=copy.deepcopy(syllables)
 	for word,rhythm in zip(words,rhythms):
 		tree_per_word(word,rhythm,tree_init,syllable_copy)
 	# print tree_init['rhythm4']
@@ -101,5 +104,7 @@ def main():
 	while phone:
 		print phone.txt,
 		phone=phone.rbrother
+	print
+	#print syllables
 
 main()
