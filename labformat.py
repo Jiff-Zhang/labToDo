@@ -79,9 +79,9 @@ def tree(words,rhythms,syllables):
 		tree_init[value]=[]
 		tree_init['assist'][value]=None
 	# print tree_init
-	syllable_copy=copy.deepcopy(syllables)
+	syllables_copy=copy.deepcopy(syllables)
 	for word,rhythm in zip(words,rhythms):
-		tree_per_word(word,rhythm,tree_init,syllable_copy)
+		tree_per_word(word,rhythm,tree_init,syllables_copy)
 	# print tree_init['rhythm4']
 	# show(tree_init['rhythm4'],0)
 	def get_first():
