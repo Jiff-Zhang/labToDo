@@ -1,2 +1,3 @@
 ## ignore these file ##
 *.pyc
+.*.swp

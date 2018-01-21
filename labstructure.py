@@ -26,4 +26,5 @@ class LabStructure(object):
 			lab.father=self
 		map(setfather,self.sons)
 		self.sons_num=len(self.sons)
-		self.txt='/'.join(son.txt for son in self.sons)
+		if self.rhythm.startswith('#') and self.rhythm!='#0':
+			self.txt='/'.join(son.txt for son in self.sons)

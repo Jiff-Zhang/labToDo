@@ -4,7 +4,7 @@ import re,copy
 from sys import exit
 from txt2pinyin import txt2pinyin
 
-rhythm_map={'ph':'phone','#0':'rhythm0','#1':'rhythm1_2','#2':'rhythm1_2','#3':'rhythm3','#4':'rhythm4'}
+rhythm_map={'ph':'phone','syl':'syllable','#0':'rhythm0','#1':'rhythm1_2','#2':'rhythm1_2','#3':'rhythm3','#4':'rhythm4'}
 
 def tree_per_word(word,rhythm,tree_init,syllables):
 	def get_list(rhythm):
@@ -15,41 +15,44 @@ def tree_per_word(word,rhythm,tree_init,syllables):
 	rhythm_list=get_list(rhythm)
 
 	if rhythm=='ph':
-		newLab=LabStructure(txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
+		pass
 
-	elif rhythm in ['#0','#1','#2']:
-		if rhythm=='#0':
-			for syllable in syllables[0:len(word)/3]:
-				for phones in syllable:
-					tree_per_word(phones,'ph',tree_init,syllables)
-			del syllables[0:len(word)/3]
-			newLab=LabStructure(sons=get_list('ph'),txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
-			tree_init['assist'][rhythm_map['ph']]=get_list('ph')[-1]
-			tree_init[rhythm_map['ph']]=[]
-			newLab.adjust()
-			newLab.txt=word
-		else:
-			tree_per_word(word,'#0',tree_init,syllables)
-			newLab=LabStructure(sons=get_list('#0'),index=len(rhythm_list)+1,rhythm=rhythm)
-			tree_init['assist'][rhythm_map['#0']]=get_list('#0')[-1]
-			tree_init[rhythm_map['#0']]=[]
-			newLab.adjust()
+	elif rhythm=='syl':
+		pre_rhythm='ph'
+		for phones in syllables[0]:
+			tree_per_word(phones,pre_rhythm,tree_init,syllables)
+		del syllables[0]
 
-	elif rhythm in ['#3','#4']:
-		if rhythm=='#3':
-			tree_per_word(word,'#1',tree_init,syllables)
-			newLab=LabStructure(sons=get_list('#1'),index=len(rhythm_list)+1,rhythm=rhythm)
-			tree_init['assist'][rhythm_map['#1']]=get_list('#1')[-1]
-			tree_init[rhythm_map['#1']]=[]
-		else:
-			tree_per_word(word,'#3',tree_init,syllables)
-			newLab=LabStructure(sons=get_list('#3'),index=len(rhythm_list)+1,rhythm=rhythm)
-			tree_init['assist'][rhythm_map['#3']]=get_list('#3')[-1]
-			tree_init[rhythm_map['#3']]=[]
-		newLab.adjust()
+	elif rhythm=='#0':
+		pre_rhythm='syl'
+		for syllable in syllables[0:len(word)/3]:
+			tree_per_word(''.join(syllable),pre_rhythm,tree_init,syllables)
+	
+	elif rhythm in ['#1','#2']:
+		pre_rhythm='#0'
+		tree_per_word(word,pre_rhythm,tree_init,syllables)
+
+	elif rhythm=='#3':
+		pre_rhythm='#1'
+		tree_per_word(word,pre_rhythm,tree_init,syllables)
+
+	elif rhythm=='#4':
+		pre_rhythm='#3'
+		tree_per_word(word,pre_rhythm,tree_init,syllables)
+	
 	else:
 		print 'error rhythm input'
 		exit(-1)
+
+	if rhythm=='ph':
+		newLab=LabStructure(txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
+
+	else:
+		newLab=LabStructure(sons=get_list(pre_rhythm),txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
+		tree_init['assist'][rhythm_map[pre_rhythm]]=get_list(pre_rhythm)[-1]
+		tree_init[rhythm_map[pre_rhythm]]=[]
+		newLab.adjust()
+		# newLab.txt=word
 
 
 	if len(rhythm_list)!=0:
@@ -83,9 +86,9 @@ def tree(words,rhythms,syllables):
 	for word,rhythm in zip(words,rhythms):
 		tree_per_word(word,rhythm,tree_init,syllables_copy)
 	# print tree_init['rhythm4']
-	# show(tree_init['rhythm4'],0)
+	show(tree_init['rhythm4'],0)
 	def get_first():
-		return tree_init['rhythm4'][0].sons[0].sons[0].sons[0].sons[0]
+		return tree_init['rhythm4'][0].sons[0].sons[0].sons[0].sons[0].sons[0]
 	return get_first()
 
 def main():
