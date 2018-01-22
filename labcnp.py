@@ -1,7 +1,7 @@
 # -- encoding: utf-8 --
 from enum import Enum
 import copy
-class LabStructure(object):
+class LabNode(object):
 	def __init__(self):
 		self.lbrother=None
 		self.rbrother=None

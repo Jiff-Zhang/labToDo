@@ -1,5 +1,5 @@
 # -- encoding: utf-8 --
-from labstructure import LabStructure,LabGator
+from labcnp import LabNode,LabGator
 import re,copy
 from sys import exit
 from txt2pinyin import txt2pinyin
@@ -45,10 +45,10 @@ def tree_per_word(word,rhythm,tree_init,syllables,poses):
 		exit(-1)
 
 	if rhythm=='ph':
-		newLab=LabStructure(txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
+		newLab=LabNode(txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
 
 	else:
-		newLab=LabStructure(sons=get_list(pre_rhythm),txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
+		newLab=LabNode(sons=get_list(pre_rhythm),txt=word,index=len(rhythm_list)+1,rhythm=rhythm)
 		tree_init['assist'][rhythm_map[pre_rhythm]]=get_list(pre_rhythm)[-1]
 		tree_init[rhythm_map[pre_rhythm]]=[]
 		newLab.adjust()
@@ -86,7 +86,7 @@ def tree(words,rhythms,syllables,poses):
 	poses_copy=copy.deepcopy(poses)
 	for word,rhythm in zip(words,rhythms):
 		tree_per_word(word,rhythm,tree_init,syllables_copy,poses_copy)
-	newLab=LabStructure(sons=tree_init[rhythm_map['#4']],index=1,rhythm='#5')
+	newLab=LabNode(sons=tree_init[rhythm_map['#4']],index=1,rhythm='#5')
 	newLab.adjust()
 	# print tree_init['rhythm4']
 	# show([newLab],0)
