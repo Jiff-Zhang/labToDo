@@ -73,7 +73,7 @@ def show(tree_list,shift=0):
 		show(item.sons,shift+1)
 
 
-def tree(words,rhythms,syllables,poses):
+def tree(words,rhythms,syllables,poses,phs_type):
 	assert len(words)==len(rhythms)
 	assert len(words)==len(poses)
 	assert len(''.join(words))/3==len(syllables)
@@ -93,9 +93,41 @@ def tree(words,rhythms,syllables,poses):
 	# show(tree_init['rhythm4'],0)
 	def get_first():
 		return tree_init['rhythm4'][0].sons[0].sons[0].sons[0].sons[0].sons[0]
-	return get_first()
+	
+	def adjust():
+		fphone=get_first()
+		if phs_type[0]=='s':
+			newLab=LabNode(txt='sil',rhythm='ph')
+			newLab.rbrother=fphone
+			fphone.lbrother=newLab
+			fphone=newLab
+		phone=fphone
+		for ptype in phs_type[1:-1]:
+			assert phone is not None
+			# print (phone.txt,ptype),
+			if ptype in ['s','d']:
+				if ptype=='s':
+					newLab=LabNode(txt='pau',rhythm='ph')
+				else:
+					newLab=LabNode(txt='sp',rhythm='ph')
+				newLab.rbrother=phone.rbrother
+				newLab.lbrother=phone
+				phone.rbrother=newLab
+				newLab.rbrother.lbrother=newLab
+				phone=newLab
+			else:
+				phone=phone.rbrother
+		assert phone is not None
+		assert phone.rbrother is None
+		if phs_type[-1]=='s':
+			phone.rbrother=LabNode(txt='sil',rhythm='ph')
+			phone.rbrother.lbrother=phone
+		return fphone
 
-def load_lab(words,rhythms,poses):
+	return adjust()
+
+def load_lab(words,rhythms,poses,times,phs_type,lab_file=None):
+	assert len(times)==len(phs_type)+1
 	# words=re.split('#\d',txt)
 	syllables=txt2pinyin(''.join(words))
 	# print syllables
@@ -107,19 +139,24 @@ def load_lab(words,rhythms,poses):
 	# print rhythms
 	# print poses
 	# print syllables
-	phone=tree(words,rhythms,syllables,poses)
+	phone=tree(words,rhythms,syllables,poses,phs_type)
 	# while phone:
 	#	print phone.txt,
 	#	phone=phone.rbrother
 	#print
 	#print syllables
-
-	for ph_list in LabGator(phone,rhythms):
-		print ph_list
+	if lab_file:
+		for ph_list in LabGator(phone,rhythms,times):
+			print >>lab_file, ph_list
+	else:
+		for ph_list in LabGator(phone,rhythms,times):
+			print ph_list
 
 
 if __name__=='__main__':
 	txt='继续#1把#1建设#2有#1中国#1特色#3社会#1主义#1事业#4推向#1前进'
+	times=[0, 264200, 360650, 492100, 596550, 737200, 774550, 989300, 1048049, 1211600, 1295550, 1417500, 1483700, 1644000, 1685300, 1719600, 1894300, 1933800, 2065200, 2156650, 2279300, 2370850, 2556100, 2583600, 2703700, 2785200, 2873050, 2992500, 3035150, 3140490, 3198140, 3284050, 3415750, 3507100, 3622700, 3766000, 3862800, 3984500, 4126900, 4213200, 4408500, 4527250, 4703800, 4757350, 4931700, 52253061]
+	phs_type=['s', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'd', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'd', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 's', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 's']
 	words=re.split('#\d',txt)
 	# print ' '.join(words)
 	syllables=txt2pinyin(''.join(words))
@@ -131,14 +168,14 @@ if __name__=='__main__':
 	print rhythms
 	print syllables
 	poses=['n']*len(words)
-	phone=tree(words,rhythms,syllables,poses)
+	phone=tree(words,rhythms,syllables,poses,phs_type)
 	# while phone:
 	#	print phone.txt,
 	#	phone=phone.rbrother
 	#print
 	#print syllables
 
-	for ph_list in LabGator(phone,rhythms):
+	for ph_list in LabGator(phone,rhythms,times):
 		print ph_list
 
 

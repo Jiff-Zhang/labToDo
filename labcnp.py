@@ -35,8 +35,9 @@ class LabNode(object):
 	
 # Month=Enum('Month',('jan','feb'))
 # print Month.jan
-Lab=Enum('Lab',('p','a','b','c','d','e','f'))
-formation=['^','-','+','=','@/A:',
+Lab=Enum('Lab',('t','p','a','b','c','d','e','f'))
+formation=[' ',' ',
+	'^','-','+','=','@/A:',
 	'-','^','@/B:',
 	'+','@','^','^','+','#','-','-/C:',
 	'_','^','#','+','+','&/D:',
@@ -46,14 +47,16 @@ formation=['^','-','+','=','@/A:',
 # for lab in Lab:
 # 	print lab
 class LabGator(object):
-	def __init__(self,phone,rhythms):
+	def __init__(self,phone,rhythms,times):
 		assert phone.rhythm=='ph'
 		self.phone=copy.deepcopy(phone)
 		self.dict={}
 		self.rhythms=rhythms
+		self.times=times
 
 	def __iter__(self):
 		while self.phone:
+			self.t()
 			self.p()
 			self.a()
 			self.b()
@@ -70,6 +73,11 @@ class LabGator(object):
 			yield reduce(lambda labf1,labf2:labf1+labf2,[lab+form for lab,form in zip(lablist,formation)])
 			# yield self.dict
 			self.phone=self.phone.rbrother
+
+	def t(self):
+		assert len(self.times)>=2
+		self.dict[Lab.t]=[str(self.times[0]),str(self.times[1])]
+		del self.times[0]
 
 	def p(self):
 		"""

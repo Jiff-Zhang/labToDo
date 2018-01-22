@@ -39,7 +39,7 @@ def seprate_syllabel(syllabel):
     elif syllabel[0] in consonant_list:
         return syllabel[0].encode('utf-8'),syllabel[1:].encode('utf-8')
     else:
-        return syllabel
+        return (syllabel.encode('utf-8'),)
 
 
 def txt2pinyin(txt):
