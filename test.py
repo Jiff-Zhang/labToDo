@@ -15,6 +15,7 @@ if __name__=='__main__':
 		script=argv[0]
 		print 'Usage: python',script,'txt_file pos_file sfs_dir wav_dir lab_dir'
 		exit(-1)
+	print txt_file
 	assert exists(txt_file) and exists(pos_file) and exists(sfs_dir) and exists(wav_dir) and exists(lab_dir)
 	sent=SentGator(txt_file,pos_file,sfs_dir,wav_dir)
 	for words,rhythms,poses,times,phs_type,sent_id in sent:

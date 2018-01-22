@@ -3,6 +3,9 @@ from os.path import exists,join
 import re,wave
 from sys import argv
 
+lpct=['《','“','‘']
+rpct=['》','：','”','’','，','。','！','、']
+
 class SentGator(object):
 	def __init__(self,txt_file,pos_file,sfs_dir,wav_dir):
 		assert exists(txt_file)
@@ -65,8 +68,8 @@ class SentGator(object):
 					pre_set_rhythm=max(pre_set_rhythm,rhythm[start])
 					start+=1
 
-				if txt!='《':
-					if txt=='》':
+				if txt not in lpct:
+					if txt in rpct:
 						rhythms[-1]=max(pre_set_rhythm,rhythms[-1])
 					else:
 						rhythms.append(pre_set_rhythm)
